@@ -1,2 +1,9 @@
 #!/usr/bin/env bash
-python -m iae_case_study.cli --outdir iae_results --n_samples 1000 --seed 42
+# Run IAE experiments on CICIDS CSV folder
+# Make sure to adjust paths to your CSV folder and results folder
+
+CIC_FOLDER="./iae_case_study/data/cic_ids/"
+OUTDIR="./results/cicids_run"
+
+mkdir -p "$OUTDIR"
+python -m iae_case_study.cli --cic_folder "$CIC_FOLDER" --outdir "$OUTDIR" --seed 42 --loglevel INFO
