@@ -1,17 +1,24 @@
 # Intent-Aware Encryption (IAE) — Modular Case Study
 
-This repository contains a modular implementation of the IAE case study:
-- synthetic data generation
-- rule-based intent labeling
-- feature pipeline and ML models (RF, LR, MLP)
-- multiple policy simulations including IAE-driven policies
-- encryption simulation using `cryptography.Fernet`
-- evaluation & outputs (CSV/JSON)
+This repository implements the IAE case study with reproducible experiments.
 
-## Quickstart
+## Features
 
-1. Create virtualenv and install dependencies:
+- Loads real CICIDS2017 CSV datasets.
+- Maps attack labels to research intents (`emergency`, `confidential-transfer`, `routine-report`, `diagnostic`, `maintenance`).
+- Builds numeric feature pipeline with scaling.
+- Trains ML classifiers: Random Forest, Logistic Regression, MLP.
+- Implements multiple policies: static, context-only, rule-based, ML-driven (IAE).
+- Simulates encryption latency & energy using `cryptography.Fernet`.
+- Evaluates latency, energy, throughput, and classification metrics.
+- Outputs JSON and CSV summaries per run.
+
+## Requirements
+
+Install dependencies:
+
 ```bash
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # Linux/macOS
+# .\venv\Scripts\activate  # Windows
 pip install -r requirements.txt
