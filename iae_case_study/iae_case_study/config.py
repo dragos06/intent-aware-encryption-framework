@@ -19,7 +19,7 @@ class Config:
         "maintenance"
     ])
     intent_prior: List[float] = field(default_factory=lambda: [0.12, 0.20, 0.45, 0.13, 0.10])
-    label_noise_prob: float = 0.05
+    label_noise_prob: float = 0.00  # keep zero for deterministic mapping in cleaned pipeline
     n_runs_per_policy: int = 30
     energy_unit_per_ms: float = 0.001
     encryption_profiles: Dict[str, EncryptionProfile] = field(default_factory=lambda: {
