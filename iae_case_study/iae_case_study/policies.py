@@ -6,10 +6,11 @@ def policy_static_strong(event_row: Dict[str, Any]) -> Tuple[str, Dict]:
     return "high", {}
 
 def policy_context_only(event_row: Dict[str, Any], thresholds: Dict = None) -> Tuple[str, Dict]:
+    # thresholds tuned to anomaly_score and data_size_kb
     thresholds = thresholds or {"anomaly": 0.6, "data_size_kb": 150, "priority": 0.8}
-    if event_row["anomaly_score"] >= thresholds["anomaly"]:
+    if event_row.get("anomaly_score", 0.0) >= thresholds["anomaly"]:
         return "high", {}
-    if event_row["data_size_kb"] >= thresholds["data_size_kb"] and event_row["priority_score"] >= thresholds["priority"]:
+    if event_row.get("data_size_kb", 0.0) >= thresholds["data_size_kb"] and event_row.get("priority_score", 0.0) >= thresholds["priority"]:
         return "medium", {}
     return "low", {}
 
@@ -36,7 +37,7 @@ def policy_iae_ml(event_row: Dict[str, Any], estimator, prob_thresholds: Dict = 
         classes = estimator.classes_
         probs = np.array([1.0 if c == pred else 0.0 for c in classes])
 
-    prob_map = {c: p for c, p in zip(classes, probs)}
+    prob_map = {c: float(p) for c, p in zip(classes, probs)}
     if prob_map.get("emergency", 0.0) >= prob_thresholds["emergency"]:
         return "high", prob_map
     if prob_map.get("confidential-transfer", 0.0) >= prob_thresholds["confidential-transfer"]:
