@@ -5,8 +5,9 @@ from .config import cfg
 
 class SimulatedEncryptor:
     """
-    Implements actual Fernet encryption but simulates algorithmic latency
-    using sleep based on profile base_latency_ms.
+    Uses Fernet for real encryption while simulating algorithmic latency
+    via sleep based on profile.base_latency_ms. This keeps encryption
+    realistic while allowing latency/energy benchmarking.
     """
     def __init__(self, profile):
         self.key = Fernet.generate_key()
