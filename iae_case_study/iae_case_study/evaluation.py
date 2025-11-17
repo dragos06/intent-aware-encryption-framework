@@ -10,6 +10,7 @@ from .policies import (
     policy_rule_based_intent_mapping,
     policy_iae_ml,
 )
+from .models import prepare_dataset_with_anomaly
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ def run_experiments(df_events: pd.DataFrame, X_matrix: np.ndarray, y_labels: np.
         "ABE_SIM": lambda row: ("abe_sim", {})
     }
 
+    # Add IAE policies per trained model
     for model_name, est in models.items():
         policies[f"IAE_{model_name}"] = (lambda est_=est: (lambda row: policy_iae_ml(row, est_)))()
 
@@ -52,14 +54,11 @@ def run_experiments(df_events: pd.DataFrame, X_matrix: np.ndarray, y_labels: np.
             action, meta = policy_callable(row)
             profile_key = action if action in profile_map else action
             if profile_key not in profile_map:
-                if profile_key in ["low", "medium", "high", "abe_sim"]:
-                    profile_key = profile_key
-                else:
-                    profile_key = "high"
+                profile_key = "high"
             encryptor = profile_map[profile_key]
 
             for _ in range(cfg.n_runs_per_policy):
-                payload = f"EVENT:{idx}:size={row['data_size_kb']:.2f}"
+                payload = f"EVENT:{idx}:size={row.get('data_size_kb', 0.0):.2f}"
                 try:
                     _, elapsed_ms = encryptor.encrypt(payload)
                 except Exception as e:
@@ -72,6 +71,7 @@ def run_experiments(df_events: pd.DataFrame, X_matrix: np.ndarray, y_labels: np.
                 successful_ops += 1
 
             if policy_name.startswith("IAE_") and isinstance(meta, dict) and meta:
+                # meta contains probability map
                 pred_intent = max(meta.items(), key=lambda kv: kv[1])[0]
                 clf_pred.append(pred_intent)
                 clf_true.append(row["intent"])
